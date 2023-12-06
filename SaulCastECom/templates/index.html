@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <h1>Hello, {{ user.username }}! How are you?</h1>
+        <div><a href="{% url 'product' %}">Our latest Podcast episodes</a></div>
+        <div><a href="{% url 'cart' %}">Cart</a></div>
+        <div><a href="{% url 'logout' %}">Logout</a></div>
+        <!-- Other content for logged-in users -->
+    {% else %}
+        <p>Welcome to SaulCastECom</p>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
+        <!-- Other content for non-logged-in users -->
+    {% endif %}
+</body>
+</html>
