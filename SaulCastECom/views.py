@@ -8,11 +8,12 @@ from .models import Podcast,Cart,CartItem
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum,F,DecimalField
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest,HttpResponse
 from paymentwall import Product,Widget
 from .paymentwall_config import Paymentwall
 from django.http import HttpResponseBadRequest
 from paymentwall import Pingback
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def index(request):
@@ -239,3 +240,19 @@ def paymentwall_pingback(request):
             print(f'Pingback validation failed: {error_summary}')
     
     return HttpResponseBadRequest('Invalid Pingback')
+
+@csrf_exempt  # Disable CSRF protection for this view
+def paymentwall_pingback(request):
+    if request.method == 'POST':
+        # Process the pingback data sent by Paymentwall
+        # Validate the pingback, handle product delivery or cancellation
+        # Return an 'OK' response to acknowledge the pingback
+
+        # Example: Validate and process the pingback
+        pingback_data = request.POST  # Retrieve pingback data from the POST request
+        # Process the pingback data (validate, handle delivery or cancellation)
+        # Return 'OK' as a response
+        return HttpResponse('OK')
+    else:
+        # Handle other HTTP methods (e.g., GET)
+        return HttpResponse(status=405)  # Method Not Allowed
