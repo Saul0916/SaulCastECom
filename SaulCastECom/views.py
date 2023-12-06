@@ -16,6 +16,7 @@ from paymentwall import Pingback
 from django.views.decorators.csrf import csrf_exempt
 from decimal import Decimal
 from paymentwall import Pingback
+from paymentwall import *
 
 # Create your views here.
 def index(request):
@@ -227,42 +228,16 @@ def paymentwall_pingback(request):
         # Paymentwall sends Pingbacks via HTTP POST
         pingback = Pingback(request.POST, request.META.get('REMOTE_ADDR'))
 
-        if pingback.validate():
+        if pingback.validate(True):
             product_id = pingback.get_product().get_id()
             if pingback.is_deliverable():
-                # Handle delivery of the product or service
-                # For example, update the user's subscription or deliver the digital product
+                # deliver the product
                 pass
             elif pingback.is_cancelable():
-                # Handle cancellation or withdrawal of the product or service
+                # withdraw the product
                 pass
 
-            return HttpResponse('OK', status=200)  # Respond to Paymentwall with 'OK'
+            print('OK') # Paymentwall expects response to be OK, otherwise the pingback will be resent
+
         else:
-            error_summary = pingback.get_error_summary()
-            print(f'Pingback validation failed: {error_summary}')
-    
-    return HttpResponseBadRequest('Invalid Pingback')
-
-@csrf_exempt  # Disable CSRF protection for this view
-def paymentwall_pingback(request):
-    pingback_data = request.GET  # Fetch pingback data (assuming GET method, adjust if POST)
-    pingback = Pingback({x: y for x, y in pingback_data.items()}, request.META.get('REMOTE_ADDR'))
-
-    if pingback.validate():
-        product_id = pingback.get_product().get_id()
-        if pingback.is_deliverable():
-            # Deliver the product
-            # Your product delivery logic here
-            pass
-        elif pingback.is_cancelable():
-            # Withdraw the product
-            # Your cancellation logic here
-            pass
-
-        return HttpResponse('OK', status=200)  # Respond with 'OK' to acknowledge the pingback
-
-    else:
-        error_summary = pingback.get_error_summary()
-        print(f'Pingback Error: {error_summary}')
-        return HttpResponseServerError('Invalid pingback data', status=400)
+            print(pingback.get_error_summary())
