@@ -38,13 +38,9 @@
             {% endfor %}
         </ul>
         <p>Total Price for All Items: ${{ total_price_all_items }}</p>
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+        <div>
+            <a href="{% url 'checkout' %}">Check Out</a>
+        </div>
     </footer>
 </body>
 </html>
