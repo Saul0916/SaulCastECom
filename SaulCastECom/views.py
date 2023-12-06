@@ -14,6 +14,8 @@ from .paymentwall_config import Paymentwall
 from django.http import HttpResponseBadRequest
 from paymentwall import Pingback
 from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
+from paymentwall import Pingback
 
 # Create your views here.
 def index(request):
@@ -74,7 +76,7 @@ def checkout_view(request):
             cart = CartItem.objects.filter(cart__user=request.user).first()  # Fetch the user's cart
             if cart:
                 podcast_id = cart.podcast.id  # Assuming CartItem holds the podcast ID
-                return redirect('paymentwall_widget', podcast_id=podcast_id, email=user.email)
+                return redirect('paymentwall_widget', podcast_id=podcast_id, email=user.email,total_price_all_items=total_price_all_items)
             else:
                 return HttpResponse("Your cart is empty")  # Handle case where the cart is empty
     else:
@@ -194,18 +196,19 @@ def update_cart(request, podcast_id):
         return redirect('product')  # Redirect to the product page
 
 @login_required
-def paymentwall_widget(request,podcast_id,email):
+def paymentwall_widget(request,podcast_id,email,total_price_all_items):
+    total_price = float(total_price_all_items)
     podcast = get_object_or_404(Podcast,pk=podcast_id)
-    product = Podcast(
+    product = Product(
         str(podcast.id),
-        str(podcast.price),
+        float(Decimal(str(total_price_all_items))),
         'USD',
-        podcast.title,
+        'All items',
         Product.TYPE_FIXED
     )
     widget = Widget(
         str(request.user.id),
-        'p1',
+        'p1_1',
         [product],
         {
             'email' : email,
@@ -243,16 +246,23 @@ def paymentwall_pingback(request):
 
 @csrf_exempt  # Disable CSRF protection for this view
 def paymentwall_pingback(request):
-    if request.method == 'POST':
-        # Process the pingback data sent by Paymentwall
-        # Validate the pingback, handle product delivery or cancellation
-        # Return an 'OK' response to acknowledge the pingback
+    pingback_data = request.GET  # Fetch pingback data (assuming GET method, adjust if POST)
+    pingback = Pingback({x: y for x, y in pingback_data.items()}, request.META.get('REMOTE_ADDR'))
 
-        # Example: Validate and process the pingback
-        pingback_data = request.POST  # Retrieve pingback data from the POST request
-        # Process the pingback data (validate, handle delivery or cancellation)
-        # Return 'OK' as a response
-        return HttpResponse('OK')
+    if pingback.validate():
+        product_id = pingback.get_product().get_id()
+        if pingback.is_deliverable():
+            # Deliver the product
+            # Your product delivery logic here
+            pass
+        elif pingback.is_cancelable():
+            # Withdraw the product
+            # Your cancellation logic here
+            pass
+
+        return HttpResponse('OK', status=200)  # Respond with 'OK' to acknowledge the pingback
+
     else:
-        # Handle other HTTP methods (e.g., GET)
-        return HttpResponse(status=405)  # Method Not Allowed
+        error_summary = pingback.get_error_summary()
+        print(f'Pingback Error: {error_summary}')
+        return HttpResponseServerError('Invalid pingback data', status=400)
