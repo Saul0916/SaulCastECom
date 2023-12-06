@@ -232,10 +232,10 @@ def paymentwall_pingback(request):
             product_id = pingback.get_product().get_id()
             if pingback.is_deliverable():
                 # deliver the product
-                pass
+                return HttpResponse("OK", content_type="text/plain")
             elif pingback.is_cancelable():
                 # withdraw the product
-                pass
+                return HttpResponse("OK", content_type="text/plain")
 
             print('OK') # Paymentwall expects response to be OK, otherwise the pingback will be resent
 
