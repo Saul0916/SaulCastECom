@@ -3,17 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        /* Styling for the buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     {% if user.is_authenticated %}
         <h1>Hello, {{ user.username }}! How are you?</h1>
-        <div><a href="{% url 'product' %}">Our latest Podcast episodes</a></div>
-        <div><a href="{% url 'logout' %}">Logout</a></div>
+        <div><a href="{% url 'product' %}" class="btn">Our latest Podcast episodes</a></div>
+        <div><a href="{% url 'logout' %}" class="btn">Logout</a></div>
         <!-- Other content for logged-in users -->
     {% else %}
         <p>Welcome to SaulCastECom</p>
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'register' %}">Register</a>
+        <a href="{% url 'login' %}" class="btn">Login</a>
+        <a href="{% url 'register' %}" class="btn">Register</a>
         <!-- Other content for non-logged-in users -->
     {% endif %}
 </body>
