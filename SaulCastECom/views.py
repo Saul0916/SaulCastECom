@@ -238,4 +238,5 @@ def paymentwall_pingback(request):
 
     else:
         print(pingback.get_error_summary())
+    return HttpResponse("OK",content_type="text/plain")
     
