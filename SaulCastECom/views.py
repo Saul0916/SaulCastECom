@@ -224,20 +224,18 @@ def paymentwall_widget(request,podcast_id,email,total_price_all_items):
     return render(request, 'paymentwall_widget.html', {'widget_url': widget_url})
 
 def paymentwall_pingback(request):
-    if request.method == 'POST':
-        # Paymentwall sends Pingbacks via HTTP POST
-        pingback = Pingback(request.POST, request.META.get('REMOTE_ADDR'))
+    pingback = Pingback({x:y for x, y in request.args.iteritems()}, request.remote_addr)
+    if pingback.validate():
+        product_id = pingback.get_product().get_id()
+        if pingback.is_deliverable():
+            # deliver the product
+            pass
+        elif pingback.is_cancelable():
+            # withdraw the product
+            pass
 
-        if pingback.validate(True):
-            product_id = pingback.get_product().get_id()
-            if pingback.is_deliverable():
-                # deliver the product
-                return HttpResponse("OK", content_type="text/plain")
-            elif pingback.is_cancelable():
-                # withdraw the product
-                return HttpResponse("OK", content_type="text/plain")
+        print('OK') # Paymentwall expects response to be OK, otherwise the pingback will be resent
 
-            print('OK') # Paymentwall expects response to be OK, otherwise the pingback will be resent
-
-        else:
-            print(pingback.get_error_summary())
+    else:
+        print(pingback.get_error_summary())
+    

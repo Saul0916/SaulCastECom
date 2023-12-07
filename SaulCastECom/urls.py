@@ -14,6 +14,6 @@ urlpatterns = [
     path('update_cart/<int:podcast_id>/', views.update_cart, name='update_cart'),
     path('checkout/', views.checkout_view, name='checkout'),
     path('paymentwall-widget/<int:podcast_id>/<str:email>/<str:total_price_all_items>/', views.paymentwall_widget, name='paymentwall_widget'),
-    path('paymentwall/pingback/', views.paymentwall_pingback, name='paymentwall_pingback'),
+    path('pingback/', views.paymentwall_pingback, name='paymentwall_pingback'),
     # Add more URL patterns as needed
 ]
