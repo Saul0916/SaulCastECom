@@ -224,7 +224,7 @@ def paymentwall_widget(request,podcast_id,email,total_price_all_items):
     return render(request, 'paymentwall_widget.html', {'widget_url': widget_url})
 
 def paymentwall_pingback(request):
-    pingback = Pingback({x:y for x, y in request.args.iteritems()}, request.remote_addr)
+    pingback = Pingback(request.POST, request.META.get('REMOTE_ADDR'))
     if pingback.validate():
         product_id = pingback.get_product().get_id()
         if pingback.is_deliverable():
@@ -238,5 +238,5 @@ def paymentwall_pingback(request):
 
     else:
         print(pingback.get_error_summary())
-    return HttpResponse("OK",content_type="text/plain")
+    return HttpResponse("OK",status=200)
     
